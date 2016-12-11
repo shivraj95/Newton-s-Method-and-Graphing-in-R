@@ -1,0 +1,57 @@
+---
+title: <center>Homework 6</center>
+author: <center>Shivraj Gill </center>
+output: html_document
+---
+1.
+We know that,
+  $$f'(x) = nx^{n-1} - {{n\alpha}\over{x}} $$ 
+
+Next, we set f'(x) = 0, to get
+$$ 0 = nx^{n-1} - {{n\alpha}\over{x}} $$
+$$ {{n\alpha}\over{x}} = nx^{n-1}$$
+$$ x = \alpha^{1/n} $$
+
+
+2. 
+$$ x_{k+1} = x_k - {{n(x_k^{n-1} - {{\alpha}\over{x_k}})}\over{n((n-1)x_k^{n-2} + {{\alpha}\over{x_k^2}})}} $$
+
+After cancelling out n, from the above equation, we can also factor out a $1\over{x}$ from the numerator and a $1\over{x_k^2}$ from the denominator to get:
+
+$$ x_{k+1} = x_k - {{({1\over{x_k}})(x_k^n - \alpha)}\over{({1\over{x_k^2}})((n-1)x_k^{n} + {\alpha})}} $$
+
+This simplifies to 
+
+$$ x_{k+1} = x_k - {{x_k(x_k^n - \alpha)}\over{(n-1)x_k^{n} + \alpha}} $$
+
+
+
+3. 
+```{r}
+  library("ggplot2")
+newtMethod = function(eps = 1e-6, n = 2, alpha = 3){
+  old_x = 1
+  u <- c()
+  v <- c()
+  target = old_x^n - n*alpha*log(old_x)
+  for(i in 1:1000){
+    u <- c(u, old_x)    
+    new_x = old_x - (old_x * (old_x^n - alpha)/((n-1)*old_x^n + alpha))
+     v <- c(v, target)
+    target = new_x^n - n*alpha*log(new_x)
+   
+    print(sprintf('%d %f %f', i, new_x, target))
+    if(abs(new_x -old_x) < eps){
+        break
+    }
+    old_x = new_x
+  }
+  df <- data.frame(x = u, y = v)
+  
+  eq = function(x, n = 2, alpha = 3){x^n - n*alpha*log(x)}
+  qplot(c(0,4), fun=eq, stat="function", geom="line", xlab="x", ylab="f(x)") + geom_point(data = df, aes(x,y), colour = "red") 
+
+  }
+
+newtMethod()
+```

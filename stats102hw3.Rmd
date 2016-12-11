@@ -1,0 +1,73 @@
+---
+title: <center>Homework 3</center>
+author: <center>Shivraj Gill </center>
+output: html_document
+---
+
+1. 
+
+```{r}
+
+findCommon = function(input, output, n = -1){  
+  org_text = scan(input, what=character(), sep = ' ')
+  words = gsub("[,.!]", "", org_text)
+  #sub
+  freq = table(words)
+  freq_frame = as.data.frame(freq)
+  colnames(freq_frame)[1] = 'Word'
+  freq_order = order(freq_frame$Freq, decreasing = TRUE)
+  ordered_freq = freq_frame[freq_order,]
+  #for outputting
+  library(readr)
+  if(n == -1){
+    write_csv(ordered_freq[,], out)
+  }
+  else{
+    write_csv(ordered_freq[1:n, ], out)
+  }
+  
+}
+#used the following test:
+#x <- 'TheConstitution.txt'
+#out <- 'output.csv'
+#findCommon(x, out)
+```
+2. 
+a. 
+```{r}
+dir <- paste(getwd(), '/usaircarrierRPM0374-0714.txt', sep ='')
+nums = scan(dir, what = double())
+nums = nums/1e09
+i = 1
+vec = vector(,length(nums))
+while(i <= length(nums)){
+  sum = 0
+  count = 0
+  while(i - count > 0 && count < 10){
+    sum = nums[i-count] + sum
+    count = count + 1
+  }
+  vec[i] = sum/count
+  i = i + 1
+}
+
+```
+b. 
+```{r}
+library(ggplot2)
+start_date = as.Date('1974-03-01')
+finish_date = as.Date('2014-08-01')
+all_date = seq(from = start_date,to = finish_date, by = 'months')
+dd = data.frame(miles = nums, date = all_date, smooth_miles = vec)
+my_plot = ggplot(data = dd, aes(x = date, y = miles, colour = 'Original Data')) + geom_line()
+my_plot = my_plot + geom_line(aes(x=date, y= smooth_miles, colour = '12-Month MA')) 
+my_plot = my_plot + xlab('Year') + ylab('Revenue Passenger Miles(RPM), billions') + ggtitle('U.S Air Carrier Revenue Passenger Miles, 1974-2014')
+my_plot = my_plot + theme(legend.position= c(0.2,0.8))
+my_plot = my_plot + theme(legend.text = element_text(size = 20))
+my_plot = my_plot + theme(legend.title=element_blank())
+my_plot = my_plot + theme(panel.grid=element_blank())
+my_plot = my_plot + theme(panel.background = element_rect(fill = 'white', colour = 'grey'))
+my_plot = my_plot + expand_limits(y = 0)
+
+my_plot
+```
